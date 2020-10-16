@@ -1,7 +1,6 @@
 #StandardStep2
 
 import random
-import numpy as np
 import copy
 from fireplace.exceptions import GameOver
 from hearthstone.enums import CardClass, CardType#
