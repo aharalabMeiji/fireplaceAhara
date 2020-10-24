@@ -8,20 +8,35 @@ from utils import *
 from fireplace.card import Card
 from fireplace.game import Game
 
+class HunterCatLogLog:
+	loglog=[]
+	pass
 
 class HunterCatAgent(Agent):
+
 	def __init__(self, myName: str, myFunction, myOption = [], myClass: CardClass = CardClass.HUNTER, rating =1000 ):
 		super().__init__(myName, myFunction, myOption, myClass, rating )
 	def HunterCatLoadData():
 		pass
-
-	def HunterCatSaveLog():
+	def ClearHunterCatLogLog(self):
+		HunterCatLogLog.loglog=[]
 		pass
 
-	def HunterCatAI(game, option=[], gameLog=[], debugLog=False):
+	def HunterCatSaveLog(self, winlose):
+		with open("hunterCatQ.csv", mode='a') as f:
+			for line in HunterCatLogLog.loglog:
+				if len(line)==4:
+					f.write("%d,%d,%d,%d,%d,%d,%d,%s\n"%(line[0],line[1],line[2],line[3],-1,-1,winlose,"***"))
+				else:
+					f.write("%d,%d,%d,%d,%d,%d,%d,%s\n"%(line[0],line[1],line[2],line[3],line[4],line[5],winlose,line[6]))
+		pass
+
+	def HunterCatAI(self, game, option=[], gameLog=[], debugLog=False):
 		if game.turn<2:
 			HunterCatAgent.HunterCatLoadData()
 		while True:
+			scoreVector = HunterCatAgent.HunterCatScore(game)
+			HunterCatLogLog.loglog.append([game.turn, scoreVector.myMinionPoint, scoreVector.myHeroPoint - scoreVector.hisHeroPoint, scoreVector.hisCharN])
 			player = game.current_player
 			myCandidates = getCandidates(game,_smartCombat=True,_includeTurnEnd=True)
 			random.shuffle(myCandidates)
@@ -36,11 +51,13 @@ class HunterCatAgent(Agent):
 					pass
 				else:
 					result = executeAction(tmpGame, myChoice, debugLog=False)
-					if result==ExceptionPlay.GAMEOVER:#終われるなら終わりにします。
+					if result==ExceptionPlay.GAMEOVER and tmpGame.current_player.opponent.hero.health<=0:
+						#終われるなら終わりにします。
+						HunterCatLogLog.loglog[-1].append(player.hero.health)
+						HunterCatLogLog.loglog[-1].append(player.opponent.hero.health)
+						HunterCatLogLog.loglog[-1].append(str(myChoice))
 						executeAction(game, myChoice, debugLog=debugLog)
 						postAction(player)
-						#if debugLog:
-						#	print( '--------------------------')
 						return
 					#else:
 						#ターンの最後までプレーする
@@ -48,27 +65,23 @@ class HunterCatAgent(Agent):
 						#複数回行って平均を取ってもよい
 				scoreVector = HunterCatAgent.HunterCatScore(tmpGame)
 				myChoice.score=scoreVector.getScore()
-				#if debugLog:
-				#	print("%s %s %s"%(myChoice.card,myChoice.type,myChoice.target),end='')
-				#	print("    (%d %d %d)->%f"%(scoreVector.myMinionPoint, scoreVector.myHeroPoint, scoreVector.hisHeroPoint, myChoice.score))
-				#	if scoreVector.hisHeroPoint<0:
-				#		print ("%d - %d + %d"%(scoreVector.hisHeroH,scoreVector.myCharA,scoreVector.hisTauntCharH))
-				#	if scoreVector.myHeroPoint<0:
-				#		print ("%d - %d + %d"%(scoreVector.myHeroH,scoreVector.hisCharA,scoreVector.myTauntCharH))
-				#	print("    %s"%myChoice.notes)
-			#if debugLog:
-			#	print( '--------------------------')
 			if len(myCandidates)>0:
 				myChoice = HunterCatAgent.HunterCatChoice(myCandidates, player, debugLog=debugLog)
+				HunterCatLogLog.loglog[-1].append(player.hero.health)
+				HunterCatLogLog.loglog[-1].append(player.opponent.hero.health)
+				HunterCatLogLog.loglog[-1].append(str(myChoice))
 				if myChoice.card==None:
-					HunterCatAgent.HunterCatSaveLog()
+					#HunterCatAgent.HunterCatSaveLog()
 					#if debugLog:
 					#	print( '--------------------------')
 					return
 				executeAction(game, myChoice, debugLog=debugLog)
 				postAction(player)
 			else:
-				HunterCatAgent.HunterCatSaveLog()
+				self.loglog[-1].append(player.hero.health)
+				self.loglog[-1].append(player.opponent.hero.health)
+				self.loglog[-1].append("None")
+				#HunterCatAgent.HunterCatSaveLog()
 				#if debugLog:
 				#	print( '--------------------------')
 				return
@@ -100,9 +113,9 @@ class HunterCatAgent(Agent):
 				score+=(eval(conditions[7])*1000)
 			#if debugLog:
 			#	print(" %f"%score)
-			if score>=10000 and choice.card!=None:
+			if score>=5000 and choice.card!=None:#詰んでいるばあいは詰ましにいく
 				return choice
-			if exists_attack and choice.card==None:
+			if exists_attack and choice.card==None:#ミニオンがあってパスを選択するのはナシ？
 				pass
 			else:
 				if maxScore<score:
@@ -159,7 +172,7 @@ class HunterCatAgent(Agent):
 					self.hisCharH += char.health
 					if char.taunt:
 						self.hisTauntCharH += char.health
-			self.myMinionPoint = self.myCharN - self.hisCharN
+			self.myMinionPoint = self.myCharA - self.hisCharA
 			self.myHeroPoint = self.myHeroH - (self.hisCharA - self.myTauntCharH)
 			self.hisHeroPoint = self.hisHeroH - (self.myCharA - self.hisTauntCharH)
 			self.SpellCN=0
