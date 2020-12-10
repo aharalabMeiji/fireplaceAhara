@@ -163,6 +163,12 @@
     <Compile Include="fireplaceAharaLab\fireplace\cards\naxxramas\adventure.py" />
     <Compile Include="fireplaceAharaLab\fireplace\cards\naxxramas\collectible.py" />
     <Compile Include="fireplaceAharaLab\fireplace\cards\naxxramas\__init__.py" />
+    <Compile Include="fireplaceAharaLab\fireplace\cards\rastakhan\hunter.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="fireplaceAharaLab\fireplace\cards\rastakhan\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="fireplaceAharaLab\fireplace\cards\scholo\hunter.py" />
     <Compile Include="fireplaceAharaLab\fireplace\cards\scholo\neutral_common.py" />
     <Compile Include="fireplaceAharaLab\fireplace\cards\scholo\__init__.py" />
@@ -256,6 +262,9 @@
     <Compile Include="fireplaceAharaLab\agent_word_strategy.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="fireplaceAharaLab\myactions.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="fireplaceAharaLab\start.py" />
     <Compile Include="fireplaceAharaLab\utils.py" />
   </ItemGroup>
@@ -284,6 +293,7 @@
     <Folder Include="fireplaceAharaLab\fireplace\cards\league" />
     <Folder Include="fireplaceAharaLab\fireplace\cards\naxxramas" />
     <Folder Include="fireplaceAharaLab\fireplace\cards\faceHunter\" />
+    <Folder Include="fireplaceAharaLab\fireplace\cards\rastakhan\" />
     <Folder Include="fireplaceAharaLab\fireplace\cards\scholo\" />
     <Folder Include="fireplaceAharaLab\fireplace\cards\tgt" />
     <Folder Include="fireplaceAharaLab\fireplace\cards\tutorial" />
